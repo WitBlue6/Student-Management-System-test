@@ -86,6 +86,9 @@ class MainPage:
         self.name = tk.StringVar()
         self.age = tk.StringVar()
         self.university = tk.StringVar()
+        self.wechat = tk.StringVar()
+        self.QQ = tk.StringVar()
+        self.phone = tk.StringVar()
 
         self.s_name = ''
         self.s_age = ''
@@ -114,19 +117,27 @@ class MainPage:
         tk.Label(self.admit_frame, text='剩下懒得做了，仅支持姓名查找').grid(row=8, column=1)
 
         self.write_frame = tk.Frame(self.root)
-        tk.Label(self.write_frame, text='录入').pack()
-        tk.Label(self.write_frame).pack()
-        tk.Label(self.write_frame, text='对象的姓名').pack()
-        tk.Entry(self.write_frame, textvariable=self.name).pack()
-        tk.Label(self.write_frame).pack()
-        tk.Label(self.write_frame, text='对象的年龄').pack()
-        tk.Entry(self.write_frame, textvariable=self.age).pack()
-        tk.Label(self.write_frame).pack()
-        tk.Label(self.write_frame, text='对象的大学').pack()
-        tk.Entry(self.write_frame, textvariable=self.university).pack()
-        tk.Button(self.write_frame, text='录入', command=self.write_in).pack()
+        tk.Label(self.write_frame, text='请输入').grid(row=0, column=2)
+        tk.Label(self.write_frame).grid(row=1)
+        tk.Label(self.write_frame, text='姓名').grid(row=2, column=1)
+        tk.Entry(self.write_frame, textvariable=self.name).grid(row=2, column=2)
+        tk.Label(self.write_frame).grid(row=3)
+        tk.Label(self.write_frame, text='年龄').grid(row=4, column=1)
+        tk.Entry(self.write_frame, textvariable=self.age).grid(row=4, column=2)
+        tk.Label(self.write_frame).grid(row=5)
+        tk.Label(self.write_frame, text='大学').grid(row=6, column=1)
+        tk.Entry(self.write_frame, textvariable=self.university).grid(row=6, column=2)
+        tk.Label(self.write_frame).grid(row=7)
+        tk.Label(self.write_frame, text='微信').grid(row=8, column=1)
+        tk.Entry(self.write_frame, textvariable=self.wechat).grid(row=8, column=2)
+        tk.Label(self.write_frame).grid(row=9)
+        tk.Label(self.write_frame, text='QQ').grid(row=10, column=1)
+        tk.Entry(self.write_frame, textvariable=self.QQ).grid(row=10, column=2)
+        tk.Label(self.write_frame).grid(row=11)
+        tk.Label(self.write_frame, text='电话').grid(row=12, column=1)
+        tk.Entry(self.write_frame, textvariable=self.phone).grid(row=12, column=2)
+        tk.Button(self.write_frame, text='录入', command=self.write_in).grid(row=13)
 
-        self.search_frame = tk.Frame()
 
         # 菜单栏
         menubar = tk.Menu(self.root)
@@ -141,15 +152,37 @@ class MainPage:
             flag = False
             for data in f.readlines():
                 if name == data.split(' ')[0]:
-                    age = data.split(' ')[1]
-                    uni = data.split(' ')[2]
+                    self.s_name = name
+                    try:
+                        self.s_age = data.split(' ')[1]
+                    except:
+                        print('No age')
+                        messagebox.showinfo(title='提示', message='部分数据缺失!')
+                    try:
+                        self.s_uni = data.split(' ')[2]
+                    except:
+                        print('No university')
+                        messagebox.showinfo(title='提示', message='部分数据缺失!')
+                    try:
+                        self.s_wechat = data.split(' ')[3]
+                    except:
+                        print('No wechat')
+                        messagebox.showinfo(title='提示', message='部分数据缺失!')
+                    try:
+                        self.s_QQ = data.split(' ')[4]
+                    except:
+                        print('No QQ')
+                        messagebox.showinfo(title='提示', message='部分数据缺失!')
+                    try:
+                        self.s_phone = data.split(' ')[5]
+                    except:
+                        print('No phone number')
+                        messagebox.showinfo(title='提示', message='部分数据缺失!')
+
                     flag = True
                     break
             # 找到
             if flag:
-                self.s_name = name
-                self.s_age = age
-                self.s_uni = uni
                 messagebox.showinfo(title='提示', message='查询成功')
                 self.show_search()
             else:
@@ -159,8 +192,12 @@ class MainPage:
         name = self.name.get()
         age = self.age.get()
         uni = self.university.get()
+        wec = self.wechat.get()
+        qq = self.QQ.get()
+        phone = self.phone.get()
+
         with open('Person.txt', 'a') as f:
-            f.writelines([name,' ', age, ' ', uni, '\n'])
+            f.writelines([name,' ', age, ' ', uni, ' ', wec, ' ', qq, ' ', phone, '\n'])
         messagebox.showinfo(title='提示', message='录入成功')
         self.write_frame.pack_forget()
 
@@ -172,7 +209,10 @@ class MainPage:
         self.about_frame.pack()
         self.admit_frame.pack_forget()
         self.write_frame.pack_forget()
-        self.search_frame.pack_forget()
+        try:
+            self.search_frame.destroy()
+        except:
+            pass
 
     def show_admit(self):
         """
@@ -182,25 +222,42 @@ class MainPage:
         self.admit_frame.pack()
         self.about_frame.pack_forget()
         self.write_frame.pack_forget()
-        self.search_frame.pack_forget()
+        try:
+            self.search_frame.destroy()
+        except:
+            pass
 
     def show_write(self):
         self.write_frame.pack()
         self.admit_frame.pack_forget()
         self.about_frame.pack_forget()
-        self.search_frame.pack_forget()
+        try:
+            self.search_frame.destroy()
+        except:
+            pass
 
     def show_search(self):
+        self.search_frame = tk.Frame()
+
         tk.Label(self.search_frame).grid(row=0)
-        tk.Label(self.search_frame, text='姓名').grid(row=1, column=1)
-        tk.Label(self.search_frame, text=self.s_name).grid(row=2, column=1)
-        tk.Label(self.search_frame).grid(row=3)
-        tk.Label(self.search_frame, text='年龄').grid(row=4, column=1)
-        tk.Label(self.search_frame, text=self.s_age).grid(row=5, column=1)
+        tk.Label(self.search_frame, text='姓名:').grid(row=1, column=1)
+        tk.Label(self.search_frame, text=self.s_name).grid(row=1, column=2)
+        tk.Label(self.search_frame).grid(row=2)
+        tk.Label(self.search_frame, text='年龄:').grid(row=3, column=1)
+        tk.Label(self.search_frame, text=self.s_age).grid(row=3, column=2)
+        tk.Label(self.search_frame).grid(row=4)
+        tk.Label(self.search_frame, text='大学:').grid(row=5, column=1)
+        tk.Label(self.search_frame, text=self.s_uni).grid(row=5, column=2)
         tk.Label(self.search_frame).grid(row=6)
-        tk.Label(self.search_frame, text='大学').grid(row=7, column=1)
-        tk.Label(self.search_frame, text=self.s_uni).grid(row=8, column=1)
-        tk.Label(self.search_frame).grid(row=9)
+        tk.Label(self.search_frame, text='微信:').grid(row=7, column=1)
+        tk.Label(self.search_frame, text=self.s_wechat).grid(row=7, column=2)
+        tk.Label(self.search_frame).grid(row=8)
+        tk.Label(self.search_frame, text='QQ:').grid(row=9, column=1)
+        tk.Label(self.search_frame, text=self.s_QQ).grid(row=9, column=2)
+        tk.Label(self.search_frame).grid(row=10)
+        tk.Label(self.search_frame, text='手机:').grid(row=11, column=1)
+        tk.Label(self.search_frame, text=self.s_phone).grid(row=11, column=2)
+
         self.search_frame.pack()
         self.admit_frame.pack_forget()
 
