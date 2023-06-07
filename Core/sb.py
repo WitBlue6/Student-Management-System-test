@@ -220,11 +220,16 @@ class MainPage:
             # 修改模式
             with open('Person.txt', 'r') as f:
                 data = f.readlines()
+                flag = False
                 no = -1
                 for person in data:
                     no += 1
                     if name == person.split(',')[0]:
+                        flag = True
                         break
+                if not flag:
+                    messagebox.showinfo(title='提示', message='请输入正确的姓名!')
+                    return
                 data[no] = name +','+ age +','+ uni +','+ wec +','+ qq +','+ phone +'\n'
             with open('Person.txt', 'w') as f:
                 f.writelines(data)
