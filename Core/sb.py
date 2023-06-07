@@ -120,9 +120,8 @@ class MainPage:
         tk.Entry(self.admit_frame, textvariable=self.name).grid(row=4,column=3)
         tk.Label(self.admit_frame).grid(row=5)
         tk.Button(self.admit_frame, text='查询', command=self.search).grid(row=6, column=2)
-        tk.Label(self.admit_frame).grid(row=7,column=2)
-        tk.Label(self.admit_frame, text='剩下懒得做了，仅支持姓名查找').grid(row=8, column=1)
 
+        self.writing_mode = True
         self.write_frame = tk.Frame(self.root)
         tk.Label(self.write_frame, text='请输入').grid(row=0, column=2)
         tk.Label(self.write_frame).grid(row=1)
@@ -150,12 +149,23 @@ class MainPage:
         self.recent_pagenum = 0  # 上一次浏览的页面
         tk.Label(self.all_frame, text='所有录入人员如下').grid(row=0)
 
+        self.change_frame = tk.Frame()
+        tk.Label(self.change_frame, text='修改已录入的信息').grid(row=0, column=0, padx=(120,0))
+        tk.Label(self.change_frame).grid(row=1)
+        tk.Label(self.change_frame, text='输入你要修改的人的姓名').grid(row=2, column=0)
+        tk.Entry(self.change_frame, textvariable=self.name).grid(row=2, column=1)
+        tk.Label(self.change_frame).grid(row=3)
+        tk.Button(self.change_frame, text='确定', command=self.change_info).grid(row=4, column=0, padx=(120,0))
+
+
         # 菜单栏
         menubar = tk.Menu(self.root)
         menubar.add_command(label='查看', command=self.show_all)
         menubar.add_command(label='查询', command=self.show_admit)
         menubar.add_command(label='录入', command=self.show_write)
+        menubar.add_command(label='修改', command=self.show_change)
         menubar.add_command(label='关于', command=self.show_about)
+
 
         self.root['menu'] = menubar
 
@@ -198,14 +208,48 @@ class MainPage:
         wec = self.wechat.get()
         qq = self.QQ.get()
         phone = self.phone.get()
+        if self.writing_mode:
+            # 录入模式
+            with open('Person.txt', 'a') as f:
+                if name:
+                    f.writelines([name,',', age, ',', uni, ',', wec, ',', qq, ',', phone, '\n'])
+                    messagebox.showinfo(title='提示', message='录入成功')
+                else:
+                    messagebox.showinfo(title='提示', message='录入失败！至少输入一个姓名!')
+        else:
+            # 修改模式
+            with open('Person.txt', 'r') as f:
+                data = f.readlines()
+                no = -1
+                for person in data:
+                    no += 1
+                    if name == person.split(',')[0]:
+                        break
+                data[no] = name +','+ age +','+ uni +','+ wec +','+ qq +','+ phone +'\n'
+            with open('Person.txt', 'w') as f:
+                f.writelines(data)
+            messagebox.showinfo(title='提示', message='修改成功!')
 
-        with open('Person.txt', 'a') as f:
-            if name:
-                f.writelines([name,' ', age, ' ', uni, ' ', wec, ' ', qq, ' ', phone, '\n'])
-                messagebox.showinfo(title='提示', message='录入成功')
-            else:
-                messagebox.showinfo(title='提示', message='录入失败！至少输入一个姓名!')
         self.write_frame.pack_forget()
+
+    def change_info(self):
+        """
+        修改或补充已录入人员的信息
+        :return:
+        """
+        with open('Person.txt', 'r') as f:
+            find = False
+            for person in f.readlines():
+                if person.split(',')[0] == self.name.get():
+                    # 查找到相关人员
+                    find = True
+                    break
+        if find:
+            messagebox.showinfo(title='提示', message='查找成功，请修改!')
+            self.writing_mode = False
+            self.show_write()
+        else:
+            messagebox.showinfo(title='提示', message='未查找到该人员！')
 
     def show_about(self):
         """
@@ -216,6 +260,7 @@ class MainPage:
         self.about_frame.pack()
         self.admit_frame.pack_forget()
         self.write_frame.pack_forget()
+        self.change_frame.pack_forget()
         try:
             self.search_frame.destroy()
         except:
@@ -244,6 +289,21 @@ class MainPage:
         self.write_frame.pack()
         self.admit_frame.pack_forget()
         self.about_frame.pack_forget()
+        self.change_frame.pack_forget()
+        try:
+            self.search_frame.destroy()
+        except:
+            pass
+    def show_change(self):
+        """
+        展示修改页面
+        :return:
+        """
+        self.writing_mode = False
+        self.change_frame.pack()
+        self.admit_frame.pack_forget()
+        self.about_frame.pack_forget()
+        self.write_frame.pack_forget()
         try:
             self.search_frame.destroy()
         except:
@@ -263,14 +323,15 @@ class MainPage:
             self.All_People = []
             each = dict()
             for Person in f.readlines():
-                if Person.split(' ')[0]:
+                if Person.split(',')[0] != '\n':
+                    print(Person)
                     each = each.copy()
-                    each["name"] = Person.split(' ')[0]
-                    each["age"] = Person.split(' ')[1]
-                    each["uni"] = Person.split(' ')[2]
-                    each["wechat"] = Person.split(' ')[3]
-                    each["QQ"] = Person.split(' ')[4]
-                    each["phone"] = Person.split(' ')[5]
+                    each["name"] = Person.split(',')[0]
+                    each["age"] = Person.split(',')[1]
+                    each["uni"] = Person.split(',')[2]
+                    each["wechat"] = Person.split(',')[3]
+                    each["QQ"] = Person.split(',')[4]
+                    each["phone"] = Person.split(',')[5]
 
                     self.All_People.append(each)
 
@@ -293,6 +354,7 @@ class MainPage:
         if self.pagenum > 0:
             self.pagenum -= 1
             self.show_all()
+
     def nextpage(self):
         """
         查看栏进入下一页
@@ -340,6 +402,7 @@ class MainPage:
         self.admit_frame.pack_forget()
         self.about_frame.pack_forget()
         self.write_frame.pack_forget()
+        self.change_frame.pack_forget()
 
 root = tk.Tk()
 MainPage(root)
