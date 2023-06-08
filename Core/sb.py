@@ -125,7 +125,7 @@ class MainPage:
         tk.Label(self.admit_frame).grid(row=5)
         tk.Button(self.admit_frame, text='查询', command=self.search).grid(row=6, column=2)
 
-        self.writing_mode = True
+
         self.write_frame = tk.Frame(self.root)
         tk.Label(self.write_frame, text='请输入').grid(row=0, column=2)
         tk.Label(self.write_frame).grid(row=1)
@@ -267,8 +267,7 @@ class MainPage:
                     break
         if find:
             messagebox.showinfo(title='提示', message='查找成功，请修改!')
-            self.writing_mode = False
-            self.show_write()
+            self.show_write(False)
         else:
             messagebox.showinfo(title='提示', message='未查找到该人员！')
 
@@ -289,6 +288,7 @@ class MainPage:
                     f.truncate()
                     f.writelines(data)
                     messagebox.showinfo(title='提示', message='删除成功!')
+                    self.pagenum = 0
                     return
         messagebox.showinfo(title='提示', message='查找失败！请检查输入姓名!')
 
@@ -324,12 +324,16 @@ class MainPage:
         except:
             pass
 
-    def show_write(self):
+    def show_write(self, writing=True):
         """
         展示录入栏
         录入新的人员信息
         :return:
         """
+        if writing:
+            self.writing_mode = True
+        else:
+            self.writing_mode = False
         self.write_frame.pack()
         self.admit_frame.pack_forget()
         self.about_frame.pack_forget()
@@ -344,7 +348,6 @@ class MainPage:
         展示修改页面
         :return:
         """
-        self.writing_mode = False
         self.change_frame.pack()
         self.admit_frame.pack_forget()
         self.about_frame.pack_forget()
