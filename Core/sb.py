@@ -87,7 +87,7 @@ class MainPage:
     """
     def __init__(self, master: tk.Tk):
         self.root = master
-        self.root.title('垃圾系统v0.1')
+        self.root.title('人员管理系统v0.1')
         self.root.geometry('600x400')
 
         self.name = tk.StringVar()
@@ -102,6 +102,7 @@ class MainPage:
         self.s_uni = ''
 
         self.create_page()
+        self.show_about()
 
     def create_page(self):
         """
@@ -112,6 +113,9 @@ class MainPage:
         tk.Label(self.about_frame, text='作者:lzh').pack()
         tk.Label(self.about_frame, text='关于作者: 宇宙第一帅').pack()
         tk.Label(self.about_frame, text='本作品是半成品, 且数据只储存在本地').pack()
+        tk.Label(self.about_frame, text='这个程序其实没有任何实际使用价值，做这个程序是为了练习tkinter').pack()
+        tk.Label(self.about_frame).pack()
+        tk.Label(self.about_frame, text='欢迎使用人员管理系统！', height=4, font=30, foreground='red').pack()
 
         self.admit_frame = tk.Frame(self.root)
         tk.Label(self.admit_frame, text='查询').grid(row=2,column=2)
@@ -157,6 +161,13 @@ class MainPage:
         tk.Label(self.change_frame).grid(row=3)
         tk.Button(self.change_frame, text='确定', command=self.change_info).grid(row=4, column=0, padx=(120,0))
 
+        self.delete_frame = tk.Frame()
+        tk.Label(self.delete_frame, text='删除一个联系人').grid(row=0, column=0, padx=(120,0))
+        tk.Label(self.delete_frame).grid(row=1)
+        tk.Label(self.delete_frame, text='输入要删除的人的姓名').grid(row=2, column=0)
+        tk.Entry(self.delete_frame, textvariable=self.name).grid(row=2, column=1)
+        tk.Label(self.delete_frame).grid(row=3)
+        tk.Button(self.delete_frame, text='确定', command=self.delete_info).grid(row=4, column=0, padx=(120, 0))
 
         # 菜单栏
         menubar = tk.Menu(self.root)
@@ -164,6 +175,7 @@ class MainPage:
         menubar.add_command(label='查询', command=self.show_admit)
         menubar.add_command(label='录入', command=self.show_write)
         menubar.add_command(label='修改', command=self.show_change)
+        menubar.add_command(label='删除', command=self.show_delete)
         menubar.add_command(label='关于', command=self.show_about)
 
 
@@ -200,6 +212,10 @@ class MainPage:
         """
         录入信息
         至少录入姓名，否则录入失败
+        录入模式：
+            姓名可以改变，录入新信息
+        修改模式：
+            姓名不能改变，信息进行重写，不自动补充。
         :return:
         """
         name = self.name.get()
@@ -256,6 +272,27 @@ class MainPage:
         else:
             messagebox.showinfo(title='提示', message='未查找到该人员！')
 
+    def delete_info(self):
+        """
+        删除存在的联系人
+        :return:
+        """
+        name = self.name.get()
+        with open('Person.txt', 'r+') as f:
+            data = f.readlines()
+            no = -1
+            for person in data:
+                no += 1
+                if name == person.split(',')[0]:
+                    data[no] = ''
+                    f.seek(0)
+                    f.truncate()
+                    f.writelines(data)
+                    messagebox.showinfo(title='提示', message='删除成功!')
+                    return
+        messagebox.showinfo(title='提示', message='查找失败！请检查输入姓名!')
+
+
     def show_about(self):
         """
         展示关于栏
@@ -266,6 +303,7 @@ class MainPage:
         self.admit_frame.pack_forget()
         self.write_frame.pack_forget()
         self.change_frame.pack_forget()
+        self.delete_frame.pack_forget()
         try:
             self.search_frame.destroy()
         except:
@@ -280,6 +318,7 @@ class MainPage:
         self.admit_frame.pack()
         self.about_frame.pack_forget()
         self.write_frame.pack_forget()
+        self.delete_frame.pack_forget()
         try:
             self.search_frame.destroy()
         except:
@@ -295,6 +334,7 @@ class MainPage:
         self.admit_frame.pack_forget()
         self.about_frame.pack_forget()
         self.change_frame.pack_forget()
+        self.delete_frame.pack_forget()
         try:
             self.search_frame.destroy()
         except:
@@ -309,6 +349,21 @@ class MainPage:
         self.admit_frame.pack_forget()
         self.about_frame.pack_forget()
         self.write_frame.pack_forget()
+        self.delete_frame.pack_forget()
+        try:
+            self.search_frame.destroy()
+        except:
+            pass
+    def show_delete(self):
+        """
+        展示删除页面
+        :return:
+        """
+        self.delete_frame.pack()
+        self.change_frame.pack_forget()
+        self.admit_frame.pack_forget()
+        self.write_frame.pack_forget()
+        self.about_frame.pack_forget()
         try:
             self.search_frame.destroy()
         except:
@@ -408,9 +463,10 @@ class MainPage:
         self.about_frame.pack_forget()
         self.write_frame.pack_forget()
         self.change_frame.pack_forget()
+        self.delete_frame.pack_forget()
 
 root = tk.Tk()
-MainPage(root)
+LoginPage(root)
 
 root.mainloop()
 
