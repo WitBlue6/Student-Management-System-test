@@ -100,6 +100,9 @@ class MainPage:
         self.s_name = ''
         self.s_age = ''
         self.s_uni = ''
+        self.s_wechat = ''
+        self.s_QQ = ''
+        self.s_phone = ''
 
         self.create_page()
         self.show_about()
@@ -188,19 +191,22 @@ class MainPage:
         :return:
         """
         name = self.name.get()
-        with open('Person.txt', 'r') as f:
-            flag = False
-            for data in f.readlines():
-                if name == data.split(' ')[0]:
-                    self.s_name = data.split(' ')[0]
-                    self.s_age = data.split(' ')[1]
-                    self.s_uni = data.split(' ')[2]
-                    self.s_wechat = data.split(' ')[3]
-                    self.s_QQ = data.split(' ')[4]
-                    self.s_phone = data.split(' ')[5]
+        try:
+            with open('Person.txt', 'r') as f:
+                flag = False
+                for data in f.readlines():
+                    if name == data.split(',')[0]:
+                        self.s_name = data.split(',')[0]
+                        self.s_age = data.split(',')[1]
+                        self.s_uni = data.split(',')[2]
+                        self.s_wechat = data.split(',')[3]
+                        self.s_QQ = data.split(',')[4]
+                        self.s_phone = data.split(',')[5]
 
-                    flag = True
-                    break
+                        flag = True
+                        break
+        except:
+            print("未发现人员录入")
             # 找到
             if flag:
                 messagebox.showinfo(title='提示', message='查询成功')
@@ -258,13 +264,16 @@ class MainPage:
         修改或补充已录入人员的信息
         :return:
         """
-        with open('Person.txt', 'r') as f:
-            find = False
-            for person in f.readlines():
-                if person.split(',')[0] == self.name.get():
-                    # 查找到相关人员
-                    find = True
-                    break
+        try:
+            with open('Person.txt', 'r') as f:
+                find = False
+                for person in f.readlines():
+                    if person.split(',')[0] == self.name.get():
+                        # 查找到相关人员
+                        find = True
+                        break
+        except:
+            print('未发现人员录入')
         if find:
             messagebox.showinfo(title='提示', message='查找成功，请修改!')
             self.show_write(False)
@@ -277,19 +286,22 @@ class MainPage:
         :return:
         """
         name = self.name.get()
-        with open('Person.txt', 'r+') as f:
-            data = f.readlines()
-            no = -1
-            for person in data:
-                no += 1
-                if name == person.split(',')[0]:
-                    data[no] = ''
-                    f.seek(0)
-                    f.truncate()
-                    f.writelines(data)
-                    messagebox.showinfo(title='提示', message='删除成功!')
-                    self.pagenum = 0
-                    return
+        try:
+            with open('Person.txt', 'r+') as f:
+                data = f.readlines()
+                no = -1
+                for person in data:
+                    no += 1
+                    if name == person.split(',')[0]:
+                        data[no] = ''
+                        f.seek(0)
+                        f.truncate()
+                        f.writelines(data)
+                        messagebox.showinfo(title='提示', message='删除成功!')
+                        self.pagenum = 0
+                        return
+        except:
+            print('未发现人员录入')
         messagebox.showinfo(title='提示', message='查找失败！请检查输入姓名!')
 
 
@@ -382,28 +394,33 @@ class MainPage:
             self.search_frame.destroy()
         except:
             pass
-        with open('Person.txt', 'r') as f:
-            self.All_People = []
-            each = dict()
-            for Person in f.readlines():
-                if Person.split(',')[0] != '\n':
-                    print(Person)
-                    each = each.copy()
-                    each["name"] = Person.split(',')[0]
-                    each["age"] = Person.split(',')[1]
-                    each["uni"] = Person.split(',')[2]
-                    each["wechat"] = Person.split(',')[3]
-                    each["QQ"] = Person.split(',')[4]
-                    each["phone"] = Person.split(',')[5]
+        try:
+            with open('Person.txt', 'r') as f:
+                self.All_People = []
+                each = dict()
+                for Person in f.readlines():
+                    if Person.split(',')[0] != '\n':
+                        print(Person)
+                        each = each.copy()
+                        each["name"] = Person.split(',')[0]
+                        each["age"] = Person.split(',')[1]
+                        each["uni"] = Person.split(',')[2]
+                        each["wechat"] = Person.split(',')[3]
+                        each["QQ"] = Person.split(',')[4]
+                        each["phone"] = Person.split(',')[5]
 
-                    self.All_People.append(each)
-
-        self.s_name = self.All_People[self.pagenum]["name"]
-        self.s_uni = self.All_People[self.pagenum]["uni"]
-        self.s_age = self.All_People[self.pagenum]["age"]
-        self.s_wechat = self.All_People[self.pagenum]["wechat"]
-        self.s_QQ = self.All_People[self.pagenum]["QQ"]
-        self.s_phone = self.All_People[self.pagenum]["phone"]
+                        self.All_People.append(each)
+        except:
+            print('未发现人员录入')
+        try:
+            self.s_name = self.All_People[self.pagenum]["name"]
+            self.s_uni = self.All_People[self.pagenum]["uni"]
+            self.s_age = self.All_People[self.pagenum]["age"]
+            self.s_wechat = self.All_People[self.pagenum]["wechat"]
+            self.s_QQ = self.All_People[self.pagenum]["QQ"]
+            self.s_phone = self.All_People[self.pagenum]["phone"]
+        except:
+            print('未建立人员薄')
 
         self.show_search(True)
 
