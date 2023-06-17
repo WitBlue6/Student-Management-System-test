@@ -208,11 +208,11 @@ class MainPage:
         except:
             print("未发现人员录入")
             # 找到
-            if flag:
-                messagebox.showinfo(title='提示', message='查询成功')
-                self.show_search(False)
-            else:
-                messagebox.showinfo(title='提示', message='未查询到该对象')
+        if flag:
+            messagebox.showinfo(title='提示', message='查询成功')
+            self.show_search(False)
+        else:
+            messagebox.showinfo(title='提示', message='未查询到该对象')
 
     def write_in(self):
         """
